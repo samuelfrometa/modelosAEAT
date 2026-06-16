@@ -1,5 +1,6 @@
 # build output
 dist/
+
 # generated types
 .astro/
 
@@ -12,13 +13,21 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-
-# environment variables
+# environment variables — never commit secrets
 .env
+.env.local
+.env.*.local
 .env.production
 
 # macOS-specific files
 .DS_Store
 
-# jetbrains setting folder
+# Windows
+Thumbs.db
+*.Zone.Identifier
+
+# IDE
 .idea/
+*.swp
+*.swo
+*~

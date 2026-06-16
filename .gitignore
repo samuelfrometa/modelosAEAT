@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+Thumbs.db
+*.Zone.Identifier
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code — local settings and session artifacts only
+.claude/settings.local.json
+.claude/.superpowers/
+.claude/docs/

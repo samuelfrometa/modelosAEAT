@@ -1,0 +1,286 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+import Icon from '../components/Icon.astro';
+import { FIELD_GROUPS, GENERATED_MD, PIPELINE, MOCK_FILE, MOCK_RESULT } from '../data/mock';
+
+const allFields = FIELD_GROUPS.flatMap(g => g.fields);
+const AI_COUNT  = allFields.filter(f => f.ai).length;
+const LOW_COUNT = allFields.filter(f => f.conf === 'baja' || !!f.note).length;
+const STEPS = ['Subir', 'Procesar', 'Revisar', 'Listo'];
+---
+<AppLayout title="Nuevo documento — Casilla">
+
+  <!-- Wizard head (hidden at step 3) -->
+  <div class="wizard-head" id="wizard-head">
+    <div class="stepper">
+      {STEPS.map((label, i) => (
+        <>
+          {i > 0 && <div class="step-line"></div>}
+          <div class="step" data-step-dot={i}>
+            <div class="step-dot">{i + 1}</div>
+            <div class="step-label">{label}</div>
+          </div>
+        </>
+      ))}
+    </div>
+    <button class="btn btn-ghost btn-sm" id="btn-salir">
+      <Icon name="x" size={15} /><span>Salir</span>
+    </button>
+  </div>
+
+  <!-- ═══ STEP 0: Subir ═══ -->
+  <div data-step="0" style="max-width:640px;margin:0 auto">
+    <div class="page-head" style="justify-content:center;text-align:center;margin-bottom:24px">
+      <div>
+        <div class="eyebrow" style="justify-content:center">
+          <Icon name="upload" size={13} stroke={2.4} />Paso 1 · Subir
+        </div>
+        <h1 class="title">Sube el modelo a rellenar</h1>
+        <p class="subtitle" style="margin:9px auto 0">
+          Arrastra el PDF del modelo de Hacienda. La IA lo convertirá a Markdown y extraerá cada casilla.
+        </p>
+      </div>
+    </div>
+
+    <div class="dropzone" id="dropzone">
+      <div class="dz-ico"><Icon name="upload" size={30} /></div>
+      <div class="dz-title">Arrastra tu documento aquí</div>
+      <div class="dz-sub">o haz clic para seleccionarlo desde tu equipo</div>
+      <div class="dz-formats">
+        <span class="chip">.pdf</span>
+        <span class="chip">.docx</span>
+        <span class="chip">.jpg / .png</span>
+        <span class="chip">hasta 25 MB</span>
+      </div>
+    </div>
+
+    <div id="filecard-wrap" style="display:none">
+      <div class="filecard">
+        <div class="doc-ico"><Icon name="file" size={20} /></div>
+        <div style="flex:1">
+          <div class="doc-name">{MOCK_FILE.name}</div>
+          <div class="doc-meta">{MOCK_FILE.size} · {MOCK_FILE.pages} páginas · PDF</div>
+        </div>
+        <span class="badge badge-ok"><Icon name="check" size={12} stroke={2.4} />Listo para procesar</span>
+        <button class="btn btn-ghost btn-sm" id="btn-remove-file">
+          <Icon name="trash" size={15} />
+        </button>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:22px">
+        <button class="btn btn-primary btn-md" id="btn-procesar">
+          <span>Procesar con IA</span><Icon name="sparkles" size={17} />
+        </button>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:9px;justify-content:center;margin-top:26px;color:var(--ink-3);font-size:12.5px">
+      <Icon name="shield" size={15} />
+      <span>Tus documentos se cifran y no se usan para entrenar modelos.</span>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 1: Procesando ═══ -->
+  <div data-step="1" style="display:none" class="proc-wrap">
+    <div style="text-align:center">
+      <div class="proc-ai">
+        <Icon name="sparkles" size={32} />
+      </div>
+      <div class="eyebrow" style="justify-content:center">
+        <Icon name="sparkles" size={13} stroke={2.4} />Paso 2 · Procesando
+      </div>
+      <h1 class="title">La IA está leyendo tu documento</h1>
+      <p class="subtitle" style="margin:9px auto 0">Normalmente tarda unos segundos. No cierres esta ventana.</p>
+    </div>
+
+    <div class="pipe" id="pipeline">
+      {PIPELINE.map((p, i) => (
+        <div class="pipe-row" data-pipe-row={i}>
+          <div class="pipe-ico" data-pipe-ico={i}>
+            <Icon name="dot" size={9} stroke={0} style="fill:currentColor" />
+          </div>
+          <div style="flex:1">
+            <div class="pipe-label">{p.label}</div>
+            <div class="pipe-detail" style="display:none">{p.detail}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+    <div class="proc-bar"><i id="proc-progress" style="width:0%"></i></div>
+  </div>
+
+  <!-- ═══ STEP 2: Revisar ═══ -->
+  <div data-step="2" style="display:none">
+    <div class="page-head" style="margin-bottom:18px">
+      <div>
+        <div class="eyebrow"><Icon name="pencil" size={13} stroke={2.4} />Paso 3 · Revisar</div>
+        <h1 class="title">Revisa las casillas</h1>
+        <p class="subtitle">
+          La IA rellenó <b style="color:var(--ink)">{AI_COUNT} casillas</b> a partir de tu PDF.
+          Confirma los importes o corrígelos antes de presentar.
+        </p>
+      </div>
+      <div style="display:flex;gap:9px;align-items:center">
+        <span class="badge badge-accent"><Icon name="sparkles" size={12} stroke={2.4} />{AI_COUNT} por IA</span>
+        {LOW_COUNT > 0
+          ? <span class="badge badge-danger"><Icon name="alert" size={12} stroke={2.4} />{LOW_COUNT} a verificar</span>
+          : <span class="badge badge-ok"><Icon name="check" size={12} stroke={2.4} />Todo verificado</span>
+        }
+      </div>
+    </div>
+
+    <div class="review-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title"><Icon name="file" size={16} />{MOCK_FILE.name}</div>
+          <div class="tabs">
+            <button class="on" data-tab-btn="pdf"><Icon name="eye" size={13} />PDF original</button>
+            <button data-tab-btn="md"><Icon name="code" size={13} />Markdown</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div id="tab-pdf" class="docview">
+            <div class="paper">
+              <h4>{MOCK_RESULT.paperTitle}</h4>
+              <div class="org">{MOCK_RESULT.paperSubtitle}</div>
+              <hr />
+              {FIELD_GROUPS.map(g => (
+                <div style="margin-bottom:14px">
+                  <div style="font-weight:700;font-size:12px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">
+                    {g.title}
+                  </div>
+                  {g.fields.map(f => (
+                    <div class="frow">
+                      <span class="lab">
+                        {f.c !== '—' && <b style="color:var(--accent-strong);font-family:var(--mono);margin-right:8px">{f.c}</b>}
+                        {f.label}
+                      </span>
+                      <span class={`val${f.conf === 'baja' ? ' hl' : ''}`}>
+                        {f.value}{f.unit ? ` ${f.unit}` : ''}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div id="tab-md" style="display:none" class="md">{GENERATED_MD}</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title"><Icon name="grid" size={16} />Casillas extraídas</div>
+          <span class="empty-note">{allFields.length} campos</span>
+        </div>
+        <div class="panel-body">
+          {FIELD_GROUPS.map(g => (
+            <div class="fgroup">
+              <div class="fgroup-h">{g.title}</div>
+              {g.fields.map(f => {
+                const flagged = f.conf === 'baja' || !!f.note;
+                const confCls = f.conf === 'alta' ? 'ok' : f.conf === 'media' ? 'warn' : 'danger';
+                return (
+                  <div class={`field${flagged ? ' flagged' : ''}`}>
+                    <div class={`casilla${f.c === '—' ? ' none' : ''}`}>{f.c === '—' ? '·' : f.c}</div>
+                    <div class="field-main">
+                      <div class="flabel">
+                        {f.label}
+                        {f.ai && <span class="ai-tag"><Icon name="sparkles" size={11} stroke={2.4} />IA</span>}
+                        <span class={`conf conf-${confCls}`}>
+                          <Icon name="dot" size={8} stroke={0} style="fill:currentColor" />
+                          {f.conf === 'alta' ? 'Alta' : f.conf === 'media' ? 'Media' : 'Baja'}
+                        </span>
+                      </div>
+                      <div class={`input${f.unit ? ' num' : ''}`}>
+                        <input value={f.value} data-field-label={f.label} />
+                        {f.unit && <span class="unit">{f.unit}</span>}
+                      </div>
+                      {flagged && f.note && (
+                        <div class="field-note">
+                          <Icon name="alert" size={14} style="flex-shrink:0;margin-top:1px" />
+                          <span>{f.note}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div class="review-foot">
+      <button class="btn btn-ghost btn-md" id="btn-volver">
+        <Icon name="chevronLeft" size={17} /><span>Volver</span>
+      </button>
+      <div style="display:flex;gap:10px;align-items:center">
+        {LOW_COUNT > 0 && (
+          <span class="empty-note" style="color:var(--warn)">{LOW_COUNT} casilla(s) por confirmar</span>
+        )}
+        <button class="btn btn-secondary btn-md" id="btn-export">
+          <Icon name="download" size={17} /><span>Exportar .md</span>
+        </button>
+        <button class="btn btn-primary btn-md" id="btn-confirmar">
+          <span>Confirmar y guardar</span><Icon name="check" size={17} />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3: Listo ═══ -->
+  <div data-step="3" style="display:none" class="done-wrap">
+    <div class="done-ico"><Icon name="checkCircle" size={40} /></div>
+    <div class="eyebrow" style="justify-content:center">
+      <Icon name="check" size={13} stroke={2.4} />Paso 4 · Listo
+    </div>
+    <h1 class="title">{MOCK_RESULT.docName} guardado</h1>
+    <p class="subtitle" style="margin:9px auto 0">
+      Tu autoliquidación está lista para descargar o presentar. La hemos añadido a tu panel.
+    </p>
+
+    <div class="panel done-card">
+      <div class="done-row">
+        <span style="display:flex;gap:11px;align-items:center">
+          <span class="doc-ico" style="width:38px;height:38px"><b>{MOCK_RESULT.model}</b></span>
+          <div>
+            <div class="doc-name">{MOCK_RESULT.docName}</div>
+            <div class="doc-meta">{MOCK_RESULT.docConcept}</div>
+          </div>
+        </span>
+        <span class="badge badge-ok"><Icon name="check" size={12} stroke={2.4} />Verificado</span>
+      </div>
+      <div class="done-row">
+        <span class="doc-col">Resultado de la autoliquidación</span>
+        <b style="font-family:var(--mono);font-size:16px">{MOCK_RESULT.amount}</b>
+      </div>
+      <div class="done-row">
+        <span class="doc-col">Formatos disponibles</span>
+        <span style="display:flex;gap:7px">
+          <span class="chip">.pdf</span>
+          <span class="chip">.md</span>
+          <span class="chip">.csv</span>
+        </span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:11px;justify-content:center;margin-top:24px">
+      <button class="btn btn-secondary btn-md" id="btn-panel">
+        <Icon name="grid" size={17} /><span>Ir al panel</span>
+      </button>
+      <button class="btn btn-primary btn-md" id="btn-descargar">
+        <Icon name="download" size={17} /><span>Descargar</span>
+      </button>
+    </div>
+    <button class="navlink" style="margin:18px auto 0;display:flex" id="btn-otro">
+      Procesar otro documento
+    </button>
+  </div>
+
+</AppLayout>
+
+<script>
+  import { initWizard } from '../scripts/wizard';
+  initWizard();
+</script>

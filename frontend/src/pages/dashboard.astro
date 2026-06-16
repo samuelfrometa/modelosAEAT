@@ -1,0 +1,63 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+import Icon from '../components/Icon.astro';
+---
+<AppLayout title="Panel — Casilla">
+
+  <div class="page-head">
+    <div>
+      <div class="eyebrow"><Icon name="grid" size={13} stroke={2.4} />Panel</div>
+      <h1 class="title">Tus declaraciones</h1>
+      <p class="subtitle">Sube un modelo de Hacienda y deja que la IA lo transcriba y rellene las casillas. Tú revisas y presentas.</p>
+    </div>
+    <a href="/nuevo" class="btn btn-primary btn-md">
+      <Icon name="plus" size={17} /><span>Nuevo documento</span>
+    </a>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-k"><Icon name="fileText" size={15} />Documentos este trimestre</div>
+      <div class="stat-v">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-k"><Icon name="clock" size={15} />Pendientes de revisión</div>
+      <div class="stat-v">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-k"><Icon name="sparkles" size={15} />Casillas rellenadas por IA</div>
+      <div class="stat-v">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-k"><Icon name="clock" size={15} />Tiempo ahorrado estimado</div>
+      <div class="stat-v">—</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="searchbox">
+      <Icon name="search" size={17} />
+      <input id="search-input" placeholder="Buscar por modelo, concepto o periodo…" />
+    </div>
+    <button class="btn btn-secondary btn-md" id="btn-filter">
+      <Icon name="grid" size={17} /><span>Todos los modelos</span>
+    </button>
+  </div>
+
+  <div class="doc-list">
+    <div class="card">
+      <div style="padding:60px 40px;text-align:center;color:var(--ink-3)">
+        <Icon name="fileText" size={36} style="opacity:.35;display:block;margin:0 auto 14px" />
+        <div style="font-weight:650;font-size:15px;margin-bottom:6px">Aún no tienes declaraciones</div>
+        <div style="font-size:13.5px">Sube tu primer modelo y la IA lo rellenará por ti.</div>
+      </div>
+    </div>
+  </div>
+
+</AppLayout>
+
+<script>
+  import { showToast } from '../scripts/toast';
+
+  document.getElementById('btn-filter')?.addEventListener('click', () => showToast('Filtrar modelos'));
+</script>

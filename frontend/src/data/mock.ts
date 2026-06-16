@@ -121,6 +121,31 @@ export const GENERATED_MD = `# Modelo 303 — Autoliquidación de IVA
 _Resultado: a ingresar._
 `;
 
+export const STATS = {
+  totalThisQuarter: 12,
+  aiFieldsTotal: 312,
+  timeSaved: '9,5',
+};
+
+export const MOCK_USER = {
+  initials: 'MR',
+};
+
+export const MOCK_FILE = {
+  name: 'modelo-303-2T.pdf',
+  size: '2,4 MB',
+  pages: 3,
+};
+
+export const MOCK_RESULT = {
+  model: '303',
+  docName: 'Modelo 303 · 2T 2026',
+  docConcept: 'IVA · Autoliquidación',
+  amount: '9.527,40 €',
+  paperTitle: 'Agencia Tributaria — Modelo 303',
+  paperSubtitle: 'Impuesto sobre el Valor Añadido · Autoliquidación · Ejercicio 2026 · 2T',
+};
+
 export const PIPELINE: PipelineStep[] = [
   { id: 'upload', label: 'Subiendo documento',       detail: 'modelo-303-2T.pdf · 2,4 MB' },
   { id: 'ocr',    label: 'Extrayendo texto (OCR)',    detail: '3 páginas reconocidas' },
