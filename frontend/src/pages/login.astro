@@ -169,7 +169,8 @@ const title = "Iniciar sesión";
         const password = (document.getElementById("password") as HTMLInputElement).value;
 
         try {
-          const res = await fetch("/v1/auth/login/", {
+          const API = import.meta.env.PUBLIC_API_URL;
+          const res = await fetch(`${API}/v1/auth/login/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
