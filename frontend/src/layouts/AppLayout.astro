@@ -51,6 +51,10 @@ const path = Astro.url.pathname;
 
       <div class="appbar-spacer"></div>
 
+      <button class="navlink" id="btn-logout" title="Cerrar sesión">
+        <Icon name="logOut" size={16} />
+      </button>
+
       <button class="avatar" id="btn-avatar">{MOCK_USER.initials}</button>
 
     </div>
@@ -68,6 +72,12 @@ const path = Astro.url.pathname;
 
   document.getElementById('nav-modelos')?.addEventListener('click', () => showToast('Nav: Modelos'));
   document.getElementById('btn-avatar')?.addEventListener('click', () => showToast('Perfil'));
+
+  document.getElementById('btn-logout')?.addEventListener('click', () => {
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+    window.location.href = '/login';
+  });
 </script>
 </body>
 </html>
