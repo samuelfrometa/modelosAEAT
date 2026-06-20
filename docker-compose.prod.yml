@@ -1,0 +1,46 @@
+services:
+
+  db:
+    image: postgres:17
+    env_file: backend/.env.prod
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-net
+    restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      target: prod
+    env_file: backend/.env.prod
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-net
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      target: prod
+    env_file: frontend/.env.prod
+    ports:
+      - "4321:4321"
+    networks:
+      - app-net
+    restart: always
+
+volumes:
+  postgres_data:
+
+networks:
+  app-net:
