@@ -26,6 +26,7 @@ staticfiles/
 .env
 .env.local
 .env.*.local
+.env.prod
 
 # pytest / coverage
 .pytest_cache/
