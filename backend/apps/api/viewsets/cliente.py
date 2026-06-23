@@ -18,6 +18,8 @@ class ClienteViewSet(ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        if user.role == User.Role.ADMIN:
+            return Cliente.objects.all()
         if user.role == User.Role.GESTOR:
             return Cliente.objects.filter(created_by=user)
         return Cliente.objects.filter(user=user)

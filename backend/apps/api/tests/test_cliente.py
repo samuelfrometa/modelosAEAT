@@ -1,6 +1,5 @@
 import pytest
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from apps.api.models import Cliente
 from apps.api.tests.factories import ClienteFactory, UserFactory
@@ -254,6 +253,23 @@ def test_invalid_codigo_postal_rejected(api_client):
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert "codigo_postal" in response.data["error"]["details"]
+
+
+# ── Admin role ────────────────────────────────────────────────────────────
+
+@pytest.mark.django_db
+def test_admin_user_sees_all_clients(api_client):
+    gestor_a = UserFactory(gestor=True)
+    gestor_b = UserFactory(gestor=True)
+    ClienteFactory(created_by=gestor_a)
+    ClienteFactory(created_by=gestor_b)
+    admin = UserFactory(superuser=True)
+
+    api_client.force_authenticate(user=admin)
+    response = api_client.get(URL_LIST)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["count"] == 2
 
 
 # ── Auth ───────────────────────────────────────────────────────────────────
