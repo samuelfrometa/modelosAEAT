@@ -1,7 +1,7 @@
 import factory
 from factory.django import DjangoModelFactory
 
-from apps.api.models import Example, User
+from apps.api.models import Cliente, Example, User
 
 
 class UserFactory(DjangoModelFactory):
@@ -59,3 +59,32 @@ class ExampleFactory(DjangoModelFactory):
 
     class Meta:
         model = Example
+
+
+class ClienteFactory(DjangoModelFactory):
+    """Factory for Cliente model instances. Default tipo: FISICA."""
+
+    tipo = Cliente.Tipo.FISICA
+    nif = factory.Sequence(lambda n: f"{n:08d}A")
+    nombre = factory.Faker("first_name", locale="es_ES")
+    apellidos = factory.Faker("last_name", locale="es_ES")
+    razon_social = ""
+    email = factory.Faker("email")
+    telefono = ""
+    calle = factory.Faker("street_address", locale="es_ES")
+    codigo_postal = "28001"
+    municipio = "Madrid"
+    provincia = "Madrid"
+    user = None
+    created_by = factory.SubFactory(UserFactory, gestor=True)
+
+    class Meta:
+        model = Cliente
+
+    class Params:
+        juridica = factory.Trait(
+            tipo=Cliente.Tipo.JURIDICA,
+            apellidos="",
+            razon_social=factory.Faker("company"),
+            nif=factory.Sequence(lambda n: f"B{n:07d}0"),
+        )
