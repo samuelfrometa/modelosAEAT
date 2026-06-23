@@ -2,7 +2,7 @@ import pytest
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from apps.api.models import Cliente, User
+from apps.api.models import Cliente
 from apps.api.tests.factories import ClienteFactory, UserFactory
 
 URL_LIST = "/v1/clientes/"
