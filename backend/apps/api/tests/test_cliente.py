@@ -189,7 +189,7 @@ def test_duplicate_nif_rejected(api_client):
     response = api_client.post(URL_LIST, payload, format="json")
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "nif" in response.data
+    assert "nif" in response.data["error"]["details"]
 
 
 @pytest.mark.django_db
@@ -210,7 +210,7 @@ def test_fisica_without_apellidos_rejected(api_client):
     response = api_client.post(URL_LIST, payload, format="json")
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "apellidos" in response.data
+    assert "apellidos" in response.data["error"]["details"]
 
 
 @pytest.mark.django_db
@@ -231,7 +231,7 @@ def test_juridica_without_razon_social_rejected(api_client):
     response = api_client.post(URL_LIST, payload, format="json")
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "razon_social" in response.data
+    assert "razon_social" in response.data["error"]["details"]
 
 
 @pytest.mark.django_db
@@ -253,7 +253,7 @@ def test_invalid_codigo_postal_rejected(api_client):
     response = api_client.post(URL_LIST, payload, format="json")
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "codigo_postal" in response.data
+    assert "codigo_postal" in response.data["error"]["details"]
 
 
 # ── Auth ───────────────────────────────────────────────────────────────────
