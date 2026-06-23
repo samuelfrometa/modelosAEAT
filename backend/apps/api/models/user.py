@@ -49,7 +49,8 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
     class Role(models.IntegerChoices):
         ADMIN = 1, "Admin"
-        # TODO: add project-specific roles here
+        GESTOR = 2, "Gestor"
+        CLIENTE = 3, "Cliente"
 
     first_name = models.CharField(max_length=150, verbose_name="First name")
     last_name = models.CharField(max_length=150, verbose_name="Last name", blank=True)

@@ -37,6 +37,12 @@ class UserFactory(DjangoModelFactory):
         inactive = factory.Trait(
             is_active=False,
         )
+        gestor = factory.Trait(
+            role=User.Role.GESTOR,
+        )
+        cliente = factory.Trait(
+            role=User.Role.CLIENTE,
+        )
 
     @classmethod
     def _create(cls, model_class: type, *args, **kwargs) -> User:
